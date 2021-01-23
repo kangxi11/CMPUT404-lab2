@@ -92,6 +92,7 @@ def main():
         #continuously listen for connections
         while True:
             conn, addr = s.accept()
+            # Forking code based on http://books.gigatux.nl/mirror/pythonprogramming/0596000855_python2-CHP-10-SECT-4.html
             reapChildren()
             childPid = os.fork()
 
