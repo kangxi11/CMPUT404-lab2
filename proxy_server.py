@@ -66,6 +66,14 @@ def send_google(payload):
         #always close at the end!
         s.close()
 
+activeChildren = []
+
+def reapChildren():
+    while activeChildren:
+        pid,stat = os.waitpid(0, os.WNOHANG)
+        if not pid: break
+        activeChildren.remove(pid)
+
 def main():
     HOST = ""
     PORT = 8001
@@ -79,30 +87,26 @@ def main():
         #bind socket to address
         s.bind((HOST, PORT))
         #set to listening mode
-        s.listen(10)
+        s.listen(2)
         
         #continuously listen for connections
-        i = 1
-        while i <= 10:
+        while True:
             conn, addr = s.accept()
-            child_pid = os.fork()
+            reapChildren()
+            childPid = os.fork()
 
-            if child_pid == 0:
+            if childPid == 0:
+                time.sleep(0.5)
                 while True:
-                    conn, addr = s.accept()
-                    print(addr)
-                    
                     #recieve data, wait a bit, then send it back
                     full_data = conn.recv(BUFFER_SIZE)
-
+                    if not full_data: break
                     returned_data = send_google(full_data)
-                    print(returned_data)
-                    time.sleep(0.5)
-                    conn.sendall(returned_data)
-                    conn.close()
-                    break
+                    conn.send(returned_data)
+                conn.close()
+                os._exit(0)
             else:
-                i += 1
+                activeChildren.append(childPid)
 
 
 if __name__ == "__main__":
