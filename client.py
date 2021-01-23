@@ -26,7 +26,7 @@ def get_remote_ip(host):
 
 #send data to server
 def send_data(serversocket, payload):
-    print("Sending payload")    
+    print("Sending payload")
     try:
         serversocket.sendall(payload.encode())
     except socket.error:

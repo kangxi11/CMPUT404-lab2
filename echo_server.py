@@ -25,6 +25,7 @@ def main():
             
             #recieve data, wait a bit, then send it back
             full_data = conn.recv(BUFFER_SIZE)
+            print(full_data)
             time.sleep(0.5)
             conn.sendall(full_data)
             conn.close()
